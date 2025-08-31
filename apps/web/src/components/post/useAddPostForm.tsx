@@ -1,8 +1,8 @@
-import { postCollection } from "@/db/post-collection";
+import { productCollection } from "@/db/product-collection";
 import { useAppForm } from "../form/useAppForm";
 import { type } from "arktype";
 
-export const addPostSchema = type({
+export const addProductSchema = type({
   title: "string > 5",
   description: "string > 10",
 });
@@ -14,7 +14,7 @@ export const useForm = () => {
       description: "",
     },
     validators: {
-      onChange: addPostSchema,
+      onChange: addProductSchema,
     },
     onSubmit: ({ value }) => {
       console.log(value);

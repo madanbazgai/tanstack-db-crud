@@ -9,7 +9,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { postCollection, type Post } from "@/db/post-collection";
+import { productCollection, type Product } from "@/db/product-collection";
 import { useLiveQuery } from "@tanstack/react-db";
 import { createFileRoute } from "@tanstack/react-router";
 import { Pencil, Trash2, MoreHorizontal } from "lucide-react";
@@ -25,17 +25,19 @@ export const Route = createFileRoute("/about")({
 });
 
 function RouteComponent() {
-  const { data: posts } = useLiveQuery((q) => q.from({ postCollection }));
+  const { data: products } = useLiveQuery((q) => q.from({ productCollection }));
 
-  const updatePost = (post: Post) => {
-    postCollection.update(post.id, (draft) => {
-      draft.title = post.title;
-      draft.body = post.body;
+  const updateProduct = (product: Product) => {
+    productCollection.update(product.id, (draft) => {
+      draft.title = product.title;
+      draft.description = product.description;
+      draft.price = product.price;
+      draft.category = product.category;
     });
   };
 
-  const deletePost = (post: Post) => {
-    postCollection.delete(post.id);
+  const deleteProduct = (product: Product) => {
+    productCollection.delete(product.id);
   };
 
   return (
@@ -54,20 +56,20 @@ function RouteComponent() {
       {/* Mobile Card View */}
       <div className="block md:hidden">
         <div className="divide-y">
-          {posts.map((post) => (
-            <div key={post.id} className="p-4">
+          {products.map((product) => (
+            <div key={product.id} className="p-4">
               <div className="flex items-start justify-between mb-2">
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 mb-1">
                     <span className="font-mono text-xs text-muted-foreground bg-muted px-2 py-1 rounded">
-                      {post.id}
+                      {product.id}
                     </span>
                   </div>
                   <h3 className="font-medium text-sm truncate mb-1">
-                    {post.title}
+                    {product.title}
                   </h3>
                   <p className="text-sm text-muted-foreground line-clamp-2">
-                    {post.body}
+                    {product.description}
                   </p>
                 </div>
                 <DropdownMenu>
@@ -76,18 +78,18 @@ function RouteComponent() {
                       size="icon"
                       variant="ghost"
                       className="h-8 w-8 ml-2"
-                      aria-label={`Actions for post ${post.id}`}
+                      aria-label={`Actions for product ${product.id}`}
                     >
                       <MoreHorizontal className="h-4 w-4" />
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end">
-                    <DropdownMenuItem onClick={() => updatePost?.(post)}>
+                    <DropdownMenuItem onClick={() => updateProduct?.(product)}>
                       <Pencil className="mr-2 h-4 w-4" />
                       Edit
                     </DropdownMenuItem>
                     <DropdownMenuItem
-                      onClick={() => deletePost?.(post)}
+                      onClick={() => deleteProduct?.(product)}
                       className="text-destructive"
                     >
                       <Trash2 className="mr-2 h-4 w-4" />
@@ -113,17 +115,19 @@ function RouteComponent() {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {posts.map((post) => (
-              <TableRow key={post.id}>
-                <TableCell className="font-mono text-xs">{post.id}</TableCell>
+            {products.map((product) => (
+              <TableRow key={product.id}>
+                <TableCell className="font-mono text-xs">
+                  {product.id}
+                </TableCell>
                 <TableCell className="font-medium max-w-[200px]">
-                  <div className="truncate" title={post.title}>
-                    {post.title}
+                  <div className="truncate" title={product.title}>
+                    {product.title}
                   </div>
                 </TableCell>
                 <TableCell className="text-muted-foreground max-w-[300px]">
-                  <div className="truncate" title={post.body}>
-                    {post.body}
+                  <div className="truncate" title={product.description}>
+                    {product.description}
                   </div>
                 </TableCell>
                 <TableCell>
@@ -132,8 +136,8 @@ function RouteComponent() {
                       size="icon"
                       variant="ghost"
                       className="h-8 w-8"
-                      aria-label={`Edit post ${post.id}`}
-                      onClick={() => updatePost?.(post)}
+                      aria-label={`Edit post ${product.id}`}
+                      onClick={() => updateProduct?.(product)}
                     >
                       <Pencil className="h-4 w-4" />
                     </Button>
@@ -141,8 +145,8 @@ function RouteComponent() {
                       size="icon"
                       variant="ghost"
                       className="h-8 w-8"
-                      aria-label={`Delete post ${post.id}`}
-                      onClick={() => deletePost?.(post)}
+                      aria-label={`Delete post ${product.id}`}
+                      onClick={() => deleteProduct?.(product)}
                     >
                       <Trash2 className="h-4 w-4" />
                     </Button>
@@ -154,7 +158,7 @@ function RouteComponent() {
         </Table>
       </div>
 
-      {posts.length === 0 && (
+      {products.length === 0 && (
         <div className="text-center py-8 text-muted-foreground">
           <p>No posts found. Create your first post to get started.</p>
         </div>

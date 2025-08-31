@@ -3,45 +3,49 @@ import { createCollection } from "@tanstack/react-db";
 import { QueryClient } from "@tanstack/react-query";
 import { type } from "arktype";
 
-export const postSchema = type({
+export const productSchema = type({
   id: "number",
   title: "string",
-  body: "string",
+  price: "string",
+  description: "string",
+  image: "string",
+  category: "string",
 });
 
-export type Post = typeof postSchema.infer;
+export type Product = typeof productSchema.infer;
+const URL = "https://fakestoreapi.com/products";
 
-export const postCollection = createCollection(
+export const productCollection = createCollection(
   queryCollectionOptions({
     queryKey: ["posts"],
-    queryFn: async (): Promise<Post[]> => {
-      const res = await fetch("https://jsonplaceholder.typicode.com/posts");
+    queryFn: async (): Promise<Product[]> => {
+      const res = await fetch(`${URL}?limit=10`);
       return res.json();
     },
     queryClient: new QueryClient(),
-    schema: type(postSchema.array()),
+    schema: type(productSchema.array()),
     getKey: (item) => item.id,
 
     onInsert: async ({ transaction }) => {
-      const { modified: newTodo } = transaction.mutations[0];
-      await fetch("https://jsonplaceholder.typicode.com/posts", {
+      const { modified: newProduct } = transaction.mutations[0];
+      await fetch(URL, {
         method: "POST",
-        body: JSON.stringify(newTodo),
+        body: JSON.stringify(newProduct),
       });
     },
 
     onUpdate: async ({ transaction }) => {
       const { original, modified } = transaction.mutations[0];
-      await fetch(`https://jsonplaceholder.typicode.com/posts/${original.id}`, {
+      await fetch(`${URL}/${original.id}`, {
         method: "PUT",
         body: JSON.stringify(modified),
       });
     },
     onDelete: async ({ transaction }) => {
       const { original } = transaction.mutations[0];
-      await fetch(`https://jsonplaceholder.typicode.com/posts/${original.id}`, {
+      await fetch(`${URL}/${original.id}`, {
         method: "DELETE",
       });
     },
-  })
+  }),
 );
